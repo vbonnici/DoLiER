@@ -2,6 +2,8 @@
 ### Document Listing by Enhanced suffix aRrays TOOLS
 An enhanced suffix array (SA + LCP) for indexing collections of documents in order to search and enumerate k-mers in DNA sequences
 
+<hr />
+
 This projects contains a set of tools used for the analysis of kmers in a set of sequences such as enumeration, frequencies and number of documents in which each k-mer appears.
 The library is based on enhanced suffix arrays.
 
