@@ -19,6 +19,8 @@ FASTA sequences are over the alphabet {A,C,G,T,N}.
 
 Read README.txt for a detialed documentation.
 
+<hr />
+
 ## Build
 Type make -B all to build all the executables, they will be putted in the folder bin.
 
