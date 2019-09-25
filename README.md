@@ -1,6 +1,6 @@
 # DoLiER TOOLS
 ### Document Listing by Enhanced suffix aRrays TOOLS
-An enhanced suffix array (SA + LCP) for indexing collections of documents in order to search and enumerate k-mers in DNA sequences
+An enhanced suffix array (SA + LCP) for indexing collections of documents in order to search and enumerate k-mers in collections of DNA sequences.
 
 <hr />
 
