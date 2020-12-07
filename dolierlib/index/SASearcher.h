@@ -205,6 +205,172 @@ public:
 		return t_start;
 	}
 
+
+	/*
+	 * return true if the sequence contains this kmer. 
+	 * The SA ranges are written in the "range" parameter, 
+	 * such that range[0] = first index of the kmer
+	 * and range[1] = last index + 1 of the kmer
+	 */
+	bool
+	get_range(dna5_t *kmer, int k,usize_t *range){
+		usize_t c_start = 0;
+		usize_t c_end = length-1;
+		usize_t t_start = 0;
+		usize_t t_end = 0;
+		usize_t last_si = k-1;
+		usize_t kk = static_cast<usize_t>(k);
+
+		//it's a simple binary search over SA
+		for(usize_t si=0; si<kk; si++){
+			t_start = find_first(kmer[si], c_start, c_end, si);
+			if(t_start != c_end+1){
+				//if(si != last_si){
+					t_end = find_last(kmer[si], t_start, c_end, si);
+					c_start = t_start;
+					c_end = t_end;
+				//}
+			}
+			else{
+				return false;
+			}
+		}
+
+		range[0] = c_start;
+		range[1] = c_end+1;
+
+		return true;
+	}
+
+
+/*
+        public IELSAIterator find(B3Nucleotide[] q) {
+            if(q.length<1)
+                return null;
+            
+            int l = 0;
+            int r = r_limit;
+            int ll,lr, rl, rr;
+            int m;
+            int cq;
+
+            for(int i=0; i<q.length; i++){
+                    cq = cc(q,i);
+
+                    if(cq < cc(sa[l] +i))
+                            return null;
+                    if(cq > cc(sa[r] +i))
+                            return null;
+
+
+                    ll = l;
+                    lr = r;
+                    while(true){
+                            if(ll==lr)
+                                    break;
+                            m = ll + ((lr-ll)/2);
+                            if(cq <= cc(sa[m] +i)){
+                                    lr = m;
+                            }
+                            else if(cq > cc(sa[m] +i)){
+                                    ll = m+1;
+                            }
+                    }
+                    l = ll;
+                    if(cq != cc(sa[l] +i))
+                            return null;
+
+
+                    rl = l;
+                    rr = r;
+                    while(true){
+                            if(rl==rr)
+                                    break;
+                            m = rl + ((rr-rl)/2);
+                            if((rr-rl)%2 != 0)
+                                    m++;
+                            if(cq < cc(sa[m] +i)){
+                                    rr = m-1;
+                            }
+                            else if(cq >= cc(sa[m] +i)){
+                                    rl = m;
+                            }
+                    }
+                    r = rr;
+                    if(cq != cc(sa[r] +i))
+                            return null;
+
+            }
+            return new _Iterator(this, q.length, l, r+1);
+        }
+*/
+	bool
+	get_range_iter(dna5_t *q, usize_t k, usize_t *range){
+
+			usize_t l = 0;
+            usize_t r = length-1;
+            usize_t ll,lr, rl, rr;
+            usize_t m;
+            dna5_t cq;
+
+            for(usize_t i=0; i<k; i++){
+                    cq = q[i];
+
+					while(SA[l]+i >= length){
+						l++;
+					}
+					while((r>=l) && (SA[r]+i>=length)){
+						r--;
+					}
+
+                    if(cq < seq[SA[l]+i])
+                            return false;
+                    if(cq > seq[SA[r]+i])
+                            return false;
+
+
+                    ll = l;
+                    lr = r;
+                    while(true){
+                            if(ll==lr)
+                                    break;
+                            m = ll + ((lr-ll)/2);
+                            if(cq <= seq[SA[m] +i]){
+                                    lr = m;
+                            }
+                            else if(cq > seq[SA[m] +i]){
+                                    ll = m+1;
+                            }
+                    }
+                    l = ll;
+                    if(cq != seq[SA[l] +i])
+                            return false;
+
+                    rl = l;
+                    rr = r;
+                    while(true){
+                            if(rl==rr)
+                                    break;
+                            m = rl + ((rr-rl)/2);
+                            if((rr-rl)%2 != 0)
+                                    m++;
+                            if(cq < seq[SA[m] +i]){
+                                    rr = m-1;
+                            }
+                            else if(cq >= seq[SA[m] +i]){
+                                    rl = m;
+                            }
+                    }
+                    r = rr;
+                    if(cq != seq[SA[r] +i])
+                            return false;
+
+            }
+			range[0] = l;
+			range[1] = r;
+			return true;
+	}
+
 	/*
 	 * return true if the sequence contains the reverse complement of this kmer
 	 */

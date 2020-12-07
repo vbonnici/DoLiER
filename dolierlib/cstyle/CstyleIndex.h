@@ -373,9 +373,9 @@ public:
 template <typename T>
 usize_t*
 build_SA(T *seq, usize_t length){
-	usize_t *SA = new usize_t[length];
-	SA = sais_build_SA(seq, length);
-	return SA;
+	//usize_t *SA;// = new usize_t[length];
+	//SA = sais_build_SA(seq, length);
+	return sais_build_SA(seq, length);
 }
 
 
@@ -404,14 +404,16 @@ usize_t*
 build_LCP(T *seq, usize_t length, usize_t *SA){
 	usize_t *LCP = new usize_t[length];
 
-	int* rank = new int [length];
+	_si64* rank = new _si64 [length];
 
-	int ilength = (int)length;
+	usize_t ilength = (usize_t)length;
 
-	for (int i = 0; i < ilength; i++)
+	for (_si64 i = 0; i < ilength; i++)
 	  rank[SA[i]] = i;
-	int h = 0, k, j;
-	for (int i = 0; i < ilength; i++){
+
+	_si64 h = 0, k, j;
+
+	for (_si64 i = 0; i < ilength; i++){
 	  k = rank[i];
 	  if (k == 0){
 		  //lcp[k] = -1;
@@ -445,11 +447,17 @@ build_NS(dna5_t *seq, usize_t length, usize_t *SA){
 	usize_t *_ns = new usize_t[length];
 	usize_t last_n = length;
 	dna5_t ncode = DNA5Alphabet::N;
-	for(int i=length-1; i>=0; i--){
+
+
+	for(usize_t i=length-1; i>=0; i--){
 		if(seq[i] >= ncode){
 			last_n = i;
 		}
 		_ns[i] = last_n - i;
+
+		if(i==0){
+			break;
+		}
 	}
 
 	for(usize_t i=0; i<length; i++){
@@ -508,9 +516,55 @@ where_first_ecode(dna5_t *seq, usize_t *SA, usize_t length){
 }
 
 
+void
+write_nelsa(
+	std::string &ofile,
+	usize_t iseq_length,
+	usize_t *SA,
+	usize_t *LCP,
+	usize_t *NS
+){
+	std::ofstream off;
+    off.open(ofile, std::ios::out | std::ios::binary);
+    off.write(reinterpret_cast<const char *>(&iseq_length), sizeof(usize_t) );
+    for(usize_t i=0; i<iseq_length; i++){
+        off.write( reinterpret_cast<const char *>(&SA[i]), sizeof(usize_t) );
+        off.write( reinterpret_cast<const char *>(&LCP[i]), sizeof(usize_t) );
+        off.write( reinterpret_cast<const char *>(&NS[i]), sizeof(usize_t) );
+    }
+    off.flush();
+    off.close();
+}
 
 
+void
+read_nelsa(
+	std::string &ifile,
+	usize_t *length,
+	usize_t *&SA,
+	usize_t *&LCP,
+	usize_t *&NS
+){
+	std::ifstream iff;
+    iff.open(ifile, std::ios::in | std::ios::binary);
 
+	iff.read(reinterpret_cast<char *>(length), sizeof(usize_t) );
+
+	SA = new usize_t[*length];
+	LCP = new usize_t[*length];
+	NS = new usize_t[*length];
+
+	std::cout<<"allocation done "<< length <<"\n";
+
+	for(usize_t i=0; i<*length; i++){
+		iff.read( reinterpret_cast<char *>(SA+i) ,sizeof(usize_t));
+		iff.read( reinterpret_cast<char *>(LCP+i) ,sizeof(usize_t));
+		iff.read( reinterpret_cast<char *>(NS+i) ,sizeof(usize_t));
+	}
+
+
+    iff.close();
+}
 
 
 }

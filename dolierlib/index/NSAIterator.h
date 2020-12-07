@@ -127,6 +127,10 @@ public:
 	usize_t occ(){
 		return i_end - i_start;
 	}
+	usize_t multiplicity(){
+		return i_end - i_start;
+	}
+
 
 
 

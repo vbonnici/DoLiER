@@ -35,6 +35,7 @@ typedef _si32		ssize_t;
 
 
 typedef uint64_t 	_ui64;
+typedef int64_t 	_si64;
 
 typedef _ui8		dna7_t;
 typedef _ui16		code7_t;

@@ -97,6 +97,36 @@ public:
 		return readed;
 	}
 
+	usize_t 
+	get_huge_length(){
+		if(!getline(ifs, _line))
+			return 0;
+
+		usize_t len = 0;
+
+		while(getline(ifs, _line) && _line[0]!='>'){
+			trim(_line);
+			len += _line.length();
+		}
+
+		return len;
+	}
+
+	bool
+	read_huge(dna5_t *seq, usize_t seq_length){
+		if(!getline(ifs, _line))
+			return false;
+
+		usize_t i=0, j=0;
+		while(getline(ifs, _line) && _line[0]!='>'){
+			trim(_line);
+			for(j=0; j<_line.length(); j++, i++){
+				seq[i] =  DNA5Alphabet::codeFor(_line[j]);
+			}
+		}
+		return i==seq_length;
+	};
+
 
 	/*
 	 * read all the sequences and put them in the output vector
