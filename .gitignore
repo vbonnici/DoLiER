@@ -74,3 +74,4 @@ bin/dolier-sort-columns
 bin/dolier-split-csv-by-k
 bin/dolier-times
 bin/dolier-times
+hg18.log
