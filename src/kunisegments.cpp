@@ -297,8 +297,9 @@ int main(int argc, char* argv[]){
 	TIMEHANDLE start_t = start_time();
 
     std::string ifasta = argv[1];
-    usize_t max_k = atoi(argv[2]);
-    std::string ianno = argv[3];
+    usize_t min_k = atoi(argv[2]);
+    usize_t max_k = atoi(argv[3]);
+    std::string ianno = argv[4];
 
     std::string tseq;//string
 	std::string iname;
@@ -481,7 +482,13 @@ int main(int argc, char* argv[]){
 
     bool* covered = new bool[iseq_length];
 
-    for(k=munique ; k<=max_k; k++){
+    usize_t mm = munique;
+    if(min_k != 0){
+        mm = min_k;
+    }
+
+    //for(k=munique ; k<=max_k; k++){
+    for(k=mm ; k<=max_k; k++){
         //delete [] it_syms;
         //delete [] kit_codes;
         //it_syms = new char[k+1]; it_syms[k] = '\0';
@@ -611,9 +618,9 @@ int main(int argc, char* argv[]){
         if(covered[iseq_length-1] == true){
             //n_segments.push_back(clength);
             n_segments_nof++;
-            u_segments_avg += clength;
-            if(clength > u_segments_max){
-                u_segments_max = clength;
+            n_segments_avg += clength;
+            if(clength > n_segments_max){
+                n_segments_max = clength;
             }
         }
 
