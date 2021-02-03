@@ -295,29 +295,55 @@ int main(int argc, char* argv[]){
 
     //usize_t k = 2;
     k = 2;
-    
-
-    bool* covered = new bool[iseq_length];
-
-    usize_t* covermult = new usize_t[iseq_length];
-    std::fill(covermult, covermult+iseq_length, 0.0);
 
     //for(k=min_k ; k<=max_k; k++){
     for(k=munique ; k<=gmrl+1; k++){
 
         usize_t dk = 0;
-        usize_t ucover = 0;
+        usize_t nof_hapaxes = 0;
         usize_t nof_unique = 0;
-        usize_t ncover = 0;
         usize_t nof_nonunique = 0;
 
-        usize_t a_ucover = 0;
+        NSAIterator it = NSAIterator::begin(iseq,iseq_length,SA,LCP,NS,first_ncode,k);
+        while(it.next()){
+            dk++;
+            if(is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
+                nof_unique++;
+            }
+            else{
+                nof_nonunique++;
+            }
+            if(it.multiplicity() == 1){
+                nof_hapaxes++;
+            }
+        }
 
 
+        dna5_t *codes = new dna5_t[k];
+        usize_t *range = new usize_t[2];
+        
+        NSAIterator it(iseq,iseq_length,SA,LCP,NS,first_ncode,0,0,k);
+
+
+        usize_t ucover = 0;
         usize_t u_segments_nof = 0;
         usize_t u_segments_avg = 0;
         usize_t u_segments_max = 0;
 
+        usize_t p = 0;
+        while(p<iseq_length-k){
+
+            for(usize_t i=0; i<k; i++){
+                codes[i] = iseq[p+i];
+            }
+            searcher.get_range_iter(codes,k,range);
+            it.i_start = range[0];
+            it.i_end = range[1];
+
+            
+        }
+
+        usize_t ncover = 0;
         usize_t n_segments_nof = 0;
         usize_t n_segments_avg = 0;
         usize_t n_segments_max = 0;
@@ -325,122 +351,20 @@ int main(int argc, char* argv[]){
 
         usize_t clength = 1;
 
-        std::fill(covered, covered+iseq_length, false);
 
-        NSAIterator it = NSAIterator::begin(iseq,iseq_length,SA,LCP,NS,first_ncode,k);
-        while(it.next()){
-            dk++;
-                if(is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
-                    nof_unique++;
-
-                    for(usize_t posi=it.i_start; posi<it.i_end; posi++){
-                        for(usize_t ki=0; ki<k; ki++){
-                            covered[ SA[posi]+ki ] = true;
-                        }
-
-                        covermult[posi + k] = it.multiplicity();
-                    }
-                }
-        }
-
-        for(usize_t i=0; i<iseq_length; i++){
-            if(covered[i]){
-                ucover++;
-            }
-        }
-
-        double mult_avg = 0.0;
-        double mult_count = 0.0;
-
-        for(usize_t p=1; p<iseq_length; p++){
-            if(covered[p] != covered[p-1]){
-                if(!covered[p]){
-                    u_segments_nof++;
-                    u_segments_avg += clength;
-                    if(clength > u_segments_max){
-                        u_segments_max = clength;
-                    }
-
-                    mult_count++;
-                    mult_avg += covermult[p-1];
-                }
-                clength = 1;
-          
-            }
-            else{
-                clength++;
-            }
-        }
-        if(covered[iseq_length-1] == true){
-            u_segments_nof++;
-            u_segments_avg += clength;
-            if(clength > u_segments_max){
-                u_segments_max = clength;
-            }
-
-            mult_count++;
-            mult_avg += covermult[iseq_length-1];
-        }
-
-
-
-        std::fill(covered, covered+iseq_length, false);
-
-
-        it = NSAIterator::begin(iseq,iseq_length,SA,LCP,NS,first_ncode,k);
-        while(it.next()){
-                if(!is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
-                    nof_nonunique++;
-
-                    for(usize_t posi=it.i_start; posi<it.i_end; posi++){
-                        for(usize_t ki=0; ki<k; ki++){
-                            covered[ SA[posi]+ki ] = true;
-                        }
-                    }
-                }
-        }
-
-        for(usize_t i=0; i<iseq_length; i++){
-            if(covered[i]) ncover++;
-        }
-
-        clength = 1;
-
-        for(usize_t p=1; p<iseq_length; p++){
-            if(covered[p] != covered[p-1]){
-                //if(!covered[p]){
-                if(!covered[p] and NS[p-1]>0){
-                    n_segments_nof++;
-                    n_segments_avg += clength;
-                    if(clength > n_segments_max){
-                        n_segments_max = clength;
-                    }
-                }
-                clength = 1;
-            }
-            else{
-                clength++;
-            }
-        }
-        if(covered[iseq_length-1] == true){
-            n_segments_nof++;
-            n_segments_avg += clength;
-            if(clength > n_segments_max){
-                n_segments_max = clength;
-            }
-        }
-
-
-        std::cout<<k<<" "<<dk<<" "
+        std::cout<<k<<" "<<dk<<" "<<nof_hapaxes<<" "
             <<nof_unique<<" "<<((double)nof_unique)/((double)dk)
             <<" "
-            <<ucover<<" "<<u_segments_nof++<<" "<< (((double) u_segments_avg ) / ((double)u_segments_nof ))<<" "<<u_segments_max
+                                <<ucover<<" "<<u_segments_nof++<<" "<< (((double) u_segments_avg ) / ((double)u_segments_nof ))<<" "<<u_segments_max
             <<" | "
             //<< mult_avg/mult_count
             //<<" | "
             <<nof_nonunique<<" "<<ncover<<" "<<n_segments_nof<<" "<< (((double) n_segments_avg ) / ((double)n_segments_nof ))<<" "<<n_segments_max
             <<"\n";
+            
 
+        delete [] codes;
+        delete [] range;
     }
 
 
@@ -451,7 +375,6 @@ int main(int argc, char* argv[]){
     delete [] SA;
     delete [] LCP;
     delete [] NS;
-    delete [] covered;
 
 	exit(0);
 }
