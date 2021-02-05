@@ -376,7 +376,7 @@ int main(int argc, char* argv[]){
 
                 for(usize_t posi=it.i_start; posi<it.i_end; posi++){
                     starts[SA[posi]] = true;
-                    for(usize_t ki=0; ki<k; ki++){
+                    for(usize_t ki=0; ki<=k; ki++){
                         covered[ SA[posi]+ki ] = true;
                     }
                 }
