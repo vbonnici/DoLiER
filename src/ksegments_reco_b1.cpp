@@ -27,8 +27,14 @@ is_unique_ext(
     usize_t *SA, usize_t *invSA, usize_t *LCP, usize_t *NS,
     SASearcher &searcher
 ){
-    if(it.multiplicity() == 1)
-        return true; 
+    //if(it.multiplicity() == 1) NOOOO!!!!! we need to check the k-1 suffix not the k-mer itself
+    //    return true; 
+
+    /*std::cout<<">";
+    for(int i=0; i<it.k; i++){
+        std::cout<<DNA5Alphabet::symbolFor(seq[SA[it.i_start]+i]);
+    }
+    std::cout<<" "<<it.i_start<<" "<<it.i_end<<"\n";*/
       
     bool ret = true;
     usize_t k = it.k-1;
@@ -44,6 +50,17 @@ is_unique_ext(
         e++;
     }
 
+    /*std::cout<<s<<" - "<<e<<"\n";
+    int si = s-1; if (si < 0) si = 0;
+    int ei = e+1; if (ei > length-1) ei--;
+    for(int i=si; i<=ei; i++){
+        std::cout<<i<<" "<<SA[i]<<" ";
+        for(int j=0; j<k+1; j++){
+            std::cout<<DNA5Alphabet::symbolFor(seq[SA[i]+j]);
+        }
+        std::cout<<"\n";
+    }*/
+
     for(i=s+1; i<=e; i++){
         if( (SA[i]+k<length) && (NS[i]>=k) && (SA[i-1]+k<length)  && (NS[i-1]>=k)){
             if( seq[SA[i]+k] != seq[SA[i-1]+k] ){
@@ -53,6 +70,11 @@ is_unique_ext(
             }
         }
     }
+    /*if(ret)
+        std::cout<<"TRUE\n";
+    else
+        std::cout<<"FALSE\n";
+        */
     return ret;
 }
 
@@ -323,10 +345,14 @@ int main(int argc, char* argv[]){
 
 
     //for(k=min_k ; k<=max_k; k++){
-    for(k=munique ; k<=gmrl+1; k++){
-    //for(k=munique ; k<9; k++){
+    for(k=munique ; k<=gmrl+2; k++){
+    //for(k=munique ; k<munique+1; k++){
+        //std::cout<<"################################################################################\n";
+        //std::cout<<k<<"\n";
+        //std::cout<<"################################################################################\n";
 
         usize_t dk = 0;
+        usize_t hk = 0;
         usize_t ucover = 0;
         usize_t nof_unique = 0;
 
@@ -355,6 +381,9 @@ int main(int argc, char* argv[]){
                     }
                 }
             }
+            if(it.multiplicity() == 1){
+                hk++;
+            }
         }
         for(usize_t i=0; i<iseq_length; i++){
             if(covered[i]){
@@ -365,13 +394,25 @@ int main(int argc, char* argv[]){
         usize_t p = 0;
         while(p<iseq_length){
             if(starts[p]){
+                
+                //NOOO!!! the k-mer after an expandable one is not expandale if the segment ends
+                /*if((p<iseq_length-1) && !starts[p+1]){
+                    std::cout<<"OPS "<<p<<" ";
+                    for(int i=0; i<k; i++){
+                        std::cout<<DNA5Alphabet::symbolFor(iseq[p+i]);
+                    }
+                    std::cout<<"\n";
+                }*/
+
                 //std::cout<<"> "<<p<<"\n";
                 clength = 0;
                 while(p<iseq_length && starts[p]){
                     p++;
                     clength++;
                 }
-                clength += k-1;
+                //clength += k-1;
+                //the k-mer after an expandable one is not expandale if the segment ends
+                clength += k;
 
                 u_segments_nof++;
                 u_segments_avg += clength;
@@ -386,7 +427,7 @@ int main(int argc, char* argv[]){
 
 
 
-        std::cout<<k<<" "<<dk<<" "
+        std::cout<<k<<" "<<dk<<" "<<hk<<" "
             <<nof_unique<<" "<<((double)nof_unique)/((double)dk)
             <<" "
             <<ucover<<" "<<u_segments_nof<<" "<< (((double) u_segments_avg ) / ((double)u_segments_nof ))<<" "<<u_segments_max
