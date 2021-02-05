@@ -389,15 +389,15 @@ int main(int argc, char* argv[]){
 
         it = NSAIterator::begin(iseq,iseq_length,SA,LCP,NS,first_ncode,k);
         while(it.next()){
-                if(!is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
-                    nof_nonunique++;
+            if(!is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
+                nof_nonunique++;
 
-                    for(usize_t posi=it.i_start; posi<it.i_end; posi++){
-                        for(usize_t ki=0; ki<k; ki++){
-                            covered[ SA[posi]+ki ] = true;
-                        }
+                for(usize_t posi=it.i_start; posi<it.i_end; posi++){
+                    for(usize_t ki=0; ki<k; ki++){
+                        covered[ SA[posi]+ki ] = true;
                     }
                 }
+            }
         }
 
         for(usize_t i=0; i<iseq_length; i++){
