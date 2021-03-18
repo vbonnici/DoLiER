@@ -20,6 +20,8 @@
 
 using namespace dolierlib;
 
+#define PRINT_KMERS
+
 bool
 is_unique_ext(
     NSAIterator &it,
@@ -344,8 +346,8 @@ int main(int argc, char* argv[]){
     bool* covered = new bool[iseq_length];
 
 
-    //for(k=min_k ; k<=max_k; k++){
-    for(k=munique ; k<=gmrl+2; k++){
+    for(k=min_k ; k<=max_k; k++){
+    //for(k=munique ; k<=gmrl+2; k++){
     //for(k=munique ; k<munique+1; k++){
         //std::cout<<"################################################################################\n";
         //std::cout<<k<<"\n";
@@ -368,10 +370,22 @@ int main(int argc, char* argv[]){
         std::fill(covered, covered+iseq_length, false);
 
 
+        #ifdef PRINT_KMERS
+        dna5_t *kmerseq = new dna5_t[ k ];
+        #endif
+
+
         NSAIterator it = NSAIterator::begin(iseq,iseq_length,SA,LCP,NS,first_ncode,k);
         while(it.next()){
             dk++;
             if(is_unique_ext(it,iseq_length,iseq,SA,invSA,LCP,NS, searcher)){
+                #ifdef PRINT_KMERS
+                it.get_kmer(kmerseq);
+                std::cout<<"@@ ";
+                print_dna5(kmerseq,k);
+                std::cout<<"\n";
+                #endif
+
                 nof_unique++;
 
                 for(usize_t posi=it.i_start; posi<it.i_end; posi++){
